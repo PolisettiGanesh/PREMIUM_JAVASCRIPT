@@ -1,0 +1,172 @@
+CLIENT–SERVER ARCHITECTURE
+(Trainer-Level, Interview-Ready Notes)
+
+------------------------------------------------------------
+1) What is Client–Server Architecture?
+- It is a model where CLIENT sends requests and SERVER sends responses.
+- Used in all modern web applications (MERN, MEAN, .NET, Java, etc.)
+
+Simple Definition:
+Client → Request → Server → Response.
+
+------------------------------------------------------------
+2) Why We Need It?
+- Clients (browser/mobile) cannot store all data.
+- Servers provide:
+    → Processing power
+    → Business Logic
+    → API services
+    → Security
+    → Database access
+
+------------------------------------------------------------
+3) Real-Life Example (Swiggy)
+1. App sends "show me restaurants".
+2. Server returns restaurant list.
+3. User places order.
+4. Server saves order in DB.
+
+This is client–server communication.
+
+------------------------------------------------------------
+4) Architecture Diagram
+
+Client (Browser/React)
+        │ Request (HTTP)
+        ▼
+Server (NodeJS/Express)
+        │ Database Query
+        ▼
+Database (MongoDB)
+        ▲
+        │ Response (JSON)
+        ▼
+Client (Updates UI)
+
+------------------------------------------------------------
+5) CLIENT Responsibilities:
+- Display UI (React/HTML/CSS)
+- Accept user input
+- Send HTTP requests using fetch/axios
+- Render server data
+- Manage client-side state (LocalStorage, Cookies, SessionStorage, Context API)
+
+------------------------------------------------------------
+6) SERVER Responsibilities:
+- Receive and validate requests
+- Authenticate users
+- Apply business logic
+- Connect to database
+- Generate response (JSON)
+- Handle security & authorization
+
+------------------------------------------------------------
+7) DATABASE Responsibilities:
+- Store user accounts
+- Store products, orders, payments
+- Persist all data
+- Provide fast read/write access
+
+------------------------------------------------------------
+8) HTTP Request–Response Cycle
+
+1. Client sends request:
+   → URL
+   → HTTP Method (GET/POST/PUT/DELETE)
+   → Headers
+   → Body (for POST)
+
+2. Server processes request.
+
+3. Server returns a response:
+   → Status code (200, 400, 404, 500)
+   → JSON data
+   → Message
+
+4. Client updates UI.
+
+------------------------------------------------------------
+9) Types of Client–Server Communication
+
+A) REST APIs (most common)
+   - GET     → Read data
+   - POST    → Create data
+   - PUT     → Update data
+   - DELETE  → Delete data
+
+B) WebSockets
+   - Real-time communication (Chats, Notifications)
+
+C) GraphQL
+   - Client decides what data it wants.
+
+------------------------------------------------------------
+10) Advantages of Client–Server Architecture
+
+- Separation of concerns (Frontend & Backend independent)
+- High scalability (one server can handle millions)
+- Security (DB not exposed to client)
+- Reusability (one backend → web, mobile, desktop)
+- Easier maintenance and upgrades
+
+------------------------------------------------------------
+11) MERN Stack Flow (Client–Server Model)
+
+React (Client)
+    │ axios/fetch
+    ▼
+Node + Express (Server)
+    │ mongoose
+    ▼
+MongoDB (Database)
+    ▲
+    │ JSON Response
+    ▼
+React UI updates
+
+------------------------------------------------------------
+12) Detailed Request Flow in MERN
+
+1. User fills login form.
+2. React calls:
+       axios.post("/api/auth/sign-in", data)
+3. Server receives request.
+4. Controller validates input.
+5. Server queries MongoDB.
+6. MongoDB returns user document.
+7. Server checks password.
+8. Server sends:
+       { ok: true, message: "Valid User" }
+9. React receives response.
+10. React navigates to dashboard.
+
+------------------------------------------------------------
+13) Important Interview Questions
+
+Q1. What is Client–Server Architecture?
+A: A model where client sends requests and server sends responses via network.
+
+Q2. Why is HTTP stateless?
+A: HTTP does not remember previous requests.
+
+Q3. What happens if server goes down?
+A: Client cannot perform any operation; API calls fail.
+
+Q4. Why separate frontend and backend?
+A:
+- Independent development
+- Reusable APIs
+- Better performance
+- Easier maintenance
+
+Q5. Can multiple clients talk to one server?
+A: Yes. Millions of clients can connect to a single server.
+
+------------------------------------------------------------
+14) Final 30-Second Summary
+
+Client = UI → sends request
+Server = Logic → processes request
+Database = Storage → permanent data
+
+Client → Server → DB → Server → Client

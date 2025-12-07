@@ -1,0 +1,335 @@
+===========================
+JSON MASTER NOTES + SNIPPETS
+===========================
+
+1) What is JSON?
+
+- JSON = JavaScript Object Notation
+- Text format to store & exchange data.
+- Looks like JavaScript objects, BUT it is just a STRING.
+- Commonly used for API responses, config files, etc.
+
+-------------------------------------------------------
+2) BASIC JSON STRUCTURES (VALID)
+
+a) JSON Object
+{
+  "name": "Ganesh",
+  "age": 22,
+  "city": "Nellore"
+}
+
+b) JSON Array
+[
+  "apple",
+  "banana",
+  "mango"
+]
+
+c) Array of Objects
+[
+  { "id": 1, "name": "Mobile" },
+  { "id": 2, "name": "Laptop" }
+]
+
+d) Nested Object
+{
+  "user": {
+    "name": "Ganesh",
+    "address": {
+      "city": "Nellore",
+      "pincode": 524001
+    }
+  }
+}
+
+-------------------------------------------------------
+3) JSON DATA TYPES (ALLOWED)
+
+ALLOWED value types:
+-------------------
+- String
+- Number
+- Boolean
+- null
+- Object
+- Array
+
+Example:
+{
+  "stringExample": "hello",
+  "numberExample": 123,
+  "floatExample": 12.34,
+  "booleanTrue": true,
+  "booleanFalse": false,
+  "nullExample": null,
+  "objectExample": { "x": 1 },
+  "arrayExample": [1, 2, 3]
+}
+
+NOT ALLOWED:
+--------------
+- undefined
+- NaN
+- Infinity
+- Functions
+- Dates as real Date objects (they must be strings)
+
+-------------------------------------------------------
+4) STRING RULES
+
+- MUST use double quotes " " (single quotes not allowed)
+- Special characters must be escaped.
+
+VALID STRINGS:
+{
+  "name": "Ganesh",
+  "quote": "He said, \"Hello\" to me.",
+  "path": "C:\\Users\\Ganesh",
+  "newLine": "Line1\nLine2"
+}
+
+INVALID STRINGS (❌):
+{
+  'name': 'Ganesh'      // single quotes
+}
+
+-------------------------------------------------------
+5) KEY RULES
+
+- Keys MUST always be in DOUBLE QUOTES.
+- Keys MUST be strings.
+- Keys should be UNIQUE (last one overrides if duplicated).
+
+VALID:
+{
+  "name": "Ganesh",
+  "age": 22
+}
+
+INVALID (❌):
+{
+  name: "Ganesh",   // missing double quotes
+  age: 22
+}
+
+INVALID (❌):
+{
+  123: "value"      // number key without quotes
+}
+
+-------------------------------------------------------
+6) NUMBER RULES
+
+VALID:
+{
+  "int": 10,
+  "float": 10.5,
+  "negative": -5,
+  "zero": 0
+}
+
+INVALID (❌):
+{
+  "notNumber": 01,      // leading zero not safe
+  "hex": 0xFF,          // hex not allowed
+  "NaN": NaN,           // NaN not allowed
+  "inf": Infinity       // Infinity not allowed
+}
+
+-------------------------------------------------------
+7) BOOLEAN & NULL
+
+VALID:
+{
+  "isActive": true,
+  "isAdmin": false,
+  "deletedAt": null
+}
+
+Note:
+- true, false, null are lowercase (no quotes).
+
+INVALID (❌):
+{
+  "isActive": True,   // capital T → invalid
+  "deletedAt": NULL   // uppercase → invalid
+}
+
+-------------------------------------------------------
+8) ARRAYS IN JSON
+
+VALID:
+[
+  1,
+  "text",
+  true,
+  null,
+  { "id": 1 },
+  [ 10, 20, 30 ]
+]
+
+INVALID (❌):
+[
+  1,
+  2,
+]                    // trailing comma not allowed
+
+-------------------------------------------------------
+9) NO TRAILING COMMAS (VERY IMPORTANT)
+
+VALID:
+{
+  "a": 1,
+  "b": 2
+}
+
+INVALID (❌):
+{
+  "a": 1,
+  "b": 2,
+}
+
+VALID ARRAY:
+[1, 2, 3]
+
+INVALID ARRAY (❌):
+[1, 2, 3,]
+
+-------------------------------------------------------
+10) JSON vs JAVASCRIPT OBJECT (DIFFERENCES)
+
+JavaScript Object (VALID in JS, but NOT JSON):
+const obj = {
+  name: "Ganesh",           // key without quotes ok in JS
+  age: 22,
+  isAdmin: true,
+  sayHi: function() {},     // functions allowed in JS
+  createdAt: new Date()     // Date object allowed in JS
+};
+
+JSON Equivalent (VALID JSON):
+{
+  "name": "Ganesh",
+  "age": 22,
+  "isAdmin": true,
+  "sayHi": "NO FUNCTIONS ALLOWED",
+  "createdAt": "2025-12-06T10:00:00Z"
+}
+
+Key differences:
+1. JSON keys must be in double quotes.
+2. JSON cannot contain functions.
+3. JSON cannot contain Date objects directly (use string).
+4. JSON cannot contain undefined, NaN, Infinity.
+
+-------------------------------------------------------
+11) JSON.stringify() AND JSON.parse()
+
+a) Convert JS Object → JSON string
+
+const user = {
+  name: "Ganesh",
+  age: 22
+};
+
+const jsonString = JSON.stringify(user);
+// Result: "{\"name\":\"Ganesh\",\"age\":22}"
+
+b) Convert JSON string → JS Object
+
+const obj = JSON.parse(jsonString);
+// obj.name === "Ganesh";
+
+c) Stringify array of objects:
+
+const products = [
+  { id: 1, name: "Mobile" },
+  { id: 2, name: "Laptop" }
+];
+
+const jsonProducts = JSON.stringify(products);
+// "[{\"id\":1,\"name\":\"Mobile\"},{\"id\":2,\"name\":\"Laptop\"}]"
+
+d) Parse it back:
+
+const arr = JSON.parse(jsonProducts);
+console.log(arr[1].name); // "Laptop"
+
+-------------------------------------------------------
+12) COMMON VALID & INVALID EXAMPLES
+
+// VALID JSON
+{
+  "user": {
+    "id": 1,
+    "name": "Ganesh",
+    "skills": ["JS", "React", "Node"],
+    "isActive": true,
+    "profile": null
+  }
+}
+
+// INVALID JSON (reasons in comments)
+{
+  name: "Ganesh",               // ❌ keys without double quotes
+  "age": 22,
+  "skills": ['JS', 'React'],    // ❌ single quotes inside array
+  "sayHi": () => {},            // ❌ function not allowed
+  "value": undefined            // ❌ undefined not allowed
+}
+
+-------------------------------------------------------
+13) MINIFIED vs PRETTY JSON
+
+Pretty (for humans):
+{
+  "id": 1,
+  "name": "Ganesh",
+  "city": "Nellore"
+}
+
+Minified (for network):
+{"id":1,"name":"Ganesh","city":"Nellore"}
+
+Both are valid. Only spaces/new lines removed.
+
+-------------------------------------------------------
+14) JSON IN APIs (TYPICAL RESPONSE)
+
+Example REST API response:
+Status: 200
+Body:
+{
+  "ok": true,
+  "result": {
+    "id": 10,
+    "username": "ganesh_01",
+    "roles": ["admin", "editor"]
+  }
+}
+
+Error response:
+{
+  "ok": false,
+  "error": "User not found"
+}
+
+-------------------------------------------------------
+15) QUICK CHECKLIST – IS THIS VALID JSON?
+
+[ ] Starts with { } or [ ]
+[ ] Keys in double quotes
+[ ] String values in double quotes
+[ ] No functions / methods
+[ ] No undefined / NaN / Infinity
+[ ] No trailing commas
+[ ] true / false / null are lowercase (no quotes)
+[ ] Numbers are plain (no hex, no leading zeros)
+[ ] All commas between items are correct
+[] create JSON in .json file [very strict]
+If all are YES → JSON is valid.
+
+===========================
+END OF JSON MASTER SNIPPET
+===========================
