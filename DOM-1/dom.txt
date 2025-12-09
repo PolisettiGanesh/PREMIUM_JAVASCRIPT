@@ -1,0 +1,232 @@
+# 🌳 DOM (Document Object Model) — Introduction
+===================================================
+
+## ✔ What is the DOM?
+    - DOM = A tree-like structure created by the browser.
+    - It represents **HTML elements as JavaScript objects**.
+    - Allows JavaScript to **access, modify, add, delete** anything in a webpage.
+
+## ✔ Why Do We Need DOM?
+    - JavaScript alone cannot change HTML.
+    - DOM gives JavaScript the power to:
+    - Change text, colors, styles
+    - Add/remove elements
+    - Handle user events (click, input, submit)
+    - Create dynamic websites
+
+
+# 🌿 How Browser Creates the DOM
+
+When Html page will render into the browser,browser will create a tree like structure called DOM.
+
+    HTML → Browser reads → Produces DOM Tree.
+
+Example:
+-----------
+<html>
+  <body>
+    <h1>Hello</h1>
+    <p>Welcome</p>
+  </body>
+</html>
+
+DOM Tree:
+------------
+- document
+  - html
+    - body
+      - h1
+      - p
+
+---
+===========================================================
+# 🌳 DOM  Types
+-----------------
+
+Node Types
+-----------
+
+- Everything in the DOM is a *node*.  
+- Each node has a type represented by a number called **nodeType**.
+- A generic term for any elements in the DOM tree 
+
+Here are the most important DOM Node Types:
+
+1️⃣ Element Node (type = 1)  
+2️⃣ Attribute Node (type = 2)  
+3️⃣ Text Node (type = 3)  
+4️⃣ Comment Node (type = 8)  
+5️⃣ Document Node (type = 9)  
+6️⃣ Document Fragment Node (type = 11)
+------------------------------------------------------------
+Node Type | Name                    | Code
+----------|-------------------------|--------------------
+1         | Element Node            | <div>, <p>, <h1>
+2         | Attribute Node          | id="", class=""
+3         | Text Node               | Text inside tags
+8         | Comment Node            | <!-- comment -->
+9         | Document Node           | document
+11        | DocumentFragment Node   | Fragment
+
+==========================================================
+
+# 🌟 DOM Access Methods 
+=======================
+✅ 1. getElementById()
+
+✔ Selects ONE element using its id
+✔ Fastest method
+
+Example
+<h1 id="title">Hello</h1>
+<script>
+  const heading = document.getElementById("title");
+  console.log(heading);
+</script>
+
+Use Case
+
+When you want to select unique elements:
+
+Login form’s username field
+
+Header title
+
+Single popup
+
+Single navbar
+
+❌ You wrote wrong
+
+You wrote:
+
+getElementByClassName()
+document.getElementById("title");
+
+
+This is incorrect.
+
+Here is the correct one:
+
+✅ 2. getElementsByClassName()
+
+✔ Selects multiple elements
+✔ Returns HTMLCollection (not array)
+
+Example
+<p class="info">A</p>
+<p class="info">B</p>
+
+<script>
+  const items = document.getElementsByClassName("info");
+  console.log(items); // collection of 2 elements
+</script>
+
+Use Case
+
+When selecting many elements with same class:
+
+All product cards
+
+All paragraph texts
+
+All buttons of a form
+
+All images in gallery
+
+❌ You wrote wrong
+
+You wrote:
+
+getElementByTagName()
+document.querySelector("#title");
+
+
+This is wrong.
+
+Correct below:
+
+✅ 3. getElementsByTagName()
+
+✔ Selects all elements by tag name (p, div, li, img)
+✔ Returns HTMLCollection
+
+Example
+<ul>
+  <li>Apple</li>
+  <li>Banana</li>
+  <li>Mango</li>
+</ul>
+
+<script>
+  const listItems = document.getElementsByTagName("li");
+  console.log(listItems); // 3 li items
+</script>
+
+Use Case
+
+Select elements by tag:
+
+All <li> items
+
+All <img> images
+
+All <input> fields
+
+All <button> tags
+
+❌ You wrote wrong
+
+You wrote:
+
+querySelectorAll()
+document.querySelectorAll(".info");
+
+
+This is correct but incomplete.
+
+Here is the full version:
+
+✅ 4. querySelectorAll()
+
+✔ Selects all matching elements
+✔ Supports any CSS selector
+✔ Returns NodeList (can use forEach!)
+
+Example
+<div class="info">A</div>
+<div class="info">B</div>
+<div class="info">C</div>
+
+<script>
+  const boxes = document.querySelectorAll(".info");
+  boxes.forEach(box => console.log(box));
+</script>
+
+⭐ Use Cases of querySelectorAll() (Best Examples)
+🎯 1. Select multiple elements by class
+const cards = document.querySelectorAll(".card");
+
+🎯 2. Select all paragraph tags
+const paragraphs = document.querySelectorAll("p");
+
+🎯 3. Select based on parent-child relation
+const items = document.querySelectorAll("ul li");
+
+🎯 4. Select specific items using pseudo-classes
+const evenRows = document.querySelectorAll("tr:nth-child(even)");
+
+🎯 5. Select inputs inside a form
+const inputs = document.querySelectorAll("form input");
+
+🎯 6. Select multiple selectors
+const elements = document.querySelectorAll(".info, .box, #title");
+
+🎯 7. Apply styling or logic to groups
+document.querySelectorAll(".highlight").forEach(el => {
+  el.style.background = "yellow";
+});
+getElementById() → Single id → Fastest  
+getElementsByClassName() → Many same class → HTMLCollection  
+getElementsByTagName() → Many same tag → HTMLCollection  
+querySelectorAll() → All CSS selector matches → NodeList (supports forEach)
