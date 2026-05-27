@@ -1,0 +1,210 @@
+
+
+
+SESSION STORAGE – TRAINER-LEVEL NOTES
+
+1) What is Session Storage?
+- Session Storage is browser storage.
+- It stores data temporarily.
+- Data is deleted automatically when TAB is closed.
+- Not shared across other tabs.
+- Stores only string data.
+- Good for temporary session data (OTP, temporary login).
+
+------------------------------------------------------------
+
+2) Key Features:
+- Temporary storage (lives only until tab is open).
+- 5MB capacity.
+- Separate storage for each tab.
+- Faster than cookies.
+- Not secure → vulnerable to XSS.
+- Data is stored as STRINGS only.
+
+------------------------------------------------------------
+
+3) Session Storage API (Syntax):
+
+Store data:
+sessionStorage.setItem("key", "value");
+
+Retrieve data:
+sessionStorage.getItem("key");
+
+Remove specific key:
+sessionStorage.removeItem("key");
+
+Clear all:
+sessionStorage.clear();
+
+------------------------------------------------------------
+
+4) Storing OBJECTS in Session Storage
+
+IMPORTANT:
+Objects MUST be converted to STRING before storing.
+
+Storing:
+const user = { name: "Ganesh", age: 22 };
+sessionStorage.setItem("user", JSON.stringify(user));
+
+Retrieving:
+const data = JSON.parse(sessionStorage.getItem("user"));
+console.log(data.name);  // Ganesh
+
+------------------------------------------------------------
+
+5) Storing ARRAYS in Session Storage
+
+Storing:
+const products = ["Mobile", "Laptop", "Tablet"];
+sessionStorage.setItem("products", JSON.stringify(products));
+
+Retrieving:
+const arr = JSON.parse(sessionStorage.getItem("products"));
+console.log(arr[1]); // Laptop
+
+------------------------------------------------------------
+
+6) Session Storage Login Flow (Flowchart Steps):
+
+1. User enters username.
+2. Store username in sessionStorage:
+      sessionStorage.setItem("uname", username);
+3. Redirect to dashboard.
+4. Dashboard loads → check sessionStorage:
+      sessionStorage.getItem("uname");
+5. If null → redirect to login.
+6. Else → show username.
+7. Auto timeout or signout:
+      sessionStorage.removeItem("uname");
+
+------------------------------------------------------------
+
+7) FULL SESSION STORAGE LOGIN EXAMPLE (Simple)
+
+login.html
+------------------------------------------------------------
+<input type="text" id="uname">
+<button onclick="LoginClick()">Login</button>
+
+<script>
+function LoginClick() {
+    var username = document.getElementById("uname").value;
+    sessionStorage.setItem("uname", username);
+    location.href = "./dashboard.html";
+}
+</script>
+------------------------------------------------------------
+
+dashboard.html
+------------------------------------------------------------
+<body onload="bodyload()">
+
+<script>
+function bodyload() {
+    var username = sessionStorage.getItem("uname");
+
+    if(username === null) {
+        location.href = "./login.html";
+    } else {
+        document.getElementById("lblUser").textContent = username;
+
+        // Auto Logout after 10 sec
+        setTimeout(() => {
+            alert("Session timed out");
+            sessionStorage.removeItem("uname");
+            location.href = "./login.html";
+        }, 10000);
+    }
+}
+
+function SignoutClick() {
+    sessionStorage.removeItem("uname");
+    location.href = "./login.html";
+}
+</script>
+------------------------------------------------------------
+
+8) Advanced Example: Store MULTIPLE values
+
+const user = {
+    username: "Ganesh",
+    email: "ganesh@example.com",
+    city: "Nellore"
+};
+
+sessionStorage.setItem("profile", JSON.stringify(user));
+
+Retrieve:
+const profile = JSON.parse(sessionStorage.getItem("profile"));
+console.log(profile.email);
+
+------------------------------------------------------------
+
+9) Advanced Example: Store array of objects
+
+const cart = [
+    { id: 1, product: "Laptop", qty: 1 },
+    { id: 2, product: "Phone", qty: 2 }
+];
+
+sessionStorage.setItem("cart", JSON.stringify(cart));
+
+Retrieve:
+const myCart = JSON.parse(sessionStorage.getItem("cart"));
+console.log(myCart[1].product); // Phone
+
+------------------------------------------------------------
+
+10) SessionStorage vs LocalStorage (Interview Table)
+
+Feature            SessionStorage                 LocalStorage
+----------------------------------------------------------------
+Lifetime          Until tab closes              Permanent
+Storage size      ~5 MB                         ~10 MB
+Security          Low                           Low
+Shared across tabs No                           Yes
+Best Use          OTP, Temp Login               Cart, Theme, Preferences
+
+------------------------------------------------------------
+
+11) IMPORTANT Limitations:
+- Data stored as strings.
+- NOT secure → never use for passwords or tokens.
+- Only works in SAME TAB.
+- Cannot handle large objects (performance issues).
+
+------------------------------------------------------------
+
+12) 1-Minute Revision Summary:
+- SessionStorage = temporary browser storage (per tab)
+- Data cleared when tab closes.
+- setItem(), getItem(), removeItem(), clear()
+- Use JSON.stringify() / JSON.parse() for objects & arrays
+- Good for OTP, multi-step forms, temporary login
+
+======================================================================
+User Login
+    │
+    ▼
+sessionStorage.setItem("uname")
+    │
+    ▼
+Dashboard Loads
+    │
+    ▼
+Check sessionStorage.getItem("uname")
+    │
+ ┌──┴───┐
+ │      │
+ ▼      ▼
+Null   Exists
+ │       │
+Redirect Show Dashboard
+ │       │
+ ▼       ▼
+Login   Timeout/Signout
+         │
+         ▼
+sessionStorage.removeItem()

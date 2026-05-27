@@ -1,0 +1,221 @@
+FULL STATE MANAGEMENT REVISION SHEET
+(For Exams + Interviews + Projects)
+
+------------------------------------------------------------
+1) Why Do We Need State Management?
+
+- Web uses HTTP protocol.
+- HTTP is STATELESS → It forgets everything after sending response.
+  GO → GET → FORGET
+- Server does NOT remember:
+    → Login
+    → Cart
+    → Dashboard state
+    → Form data
+
+To maintain user experience, we use STATE MANAGEMENT.
+
+------------------------------------------------------------
+2) Types of State Management
+
+A) CLIENT-SIDE STATE
+   (Stored in Browser)
+
+   1. Query String
+   2. Session Storage
+   3. Local Storage
+   4. Cookies
+
+B) SERVER-SIDE STATE
+   (Stored on Server / Database)
+
+   1. Server Sessions
+   2. JWT Tokens
+   3. Redis Cache
+   4. Database State
+
+------------------------------------------------------------
+3) Query String (URL State)
+
+- Data appended to URL: ?name=Ganesh
+- Visible → Not secure
+- Can be bookmarked
+- Used for:
+   → Filters
+   → Search
+   → Pagination
+   → Redirect information
+
+Read:
+var qs = new URLSearchParams(location.search);
+qs.get("name");
+
+------------------------------------------------------------
+4) Session Storage (Temporary – Per Tab)
+
+- Browser storage
+- Cleared when TAB closes
+- Not shared across tabs
+- Stores only strings
+- Good for:
+   → OTP
+   → Temporary login
+   → Multi-step forms
+
+API:
+sessionStorage.setItem(key, value)
+sessionStorage.getItem(key)
+sessionStorage.removeItem(key)
+sessionStorage.clear()
+
+Store object:
+sessionStorage.setItem("user", JSON.stringify(obj));
+
+Retrieve:
+JSON.parse(sessionStorage.getItem("user"));
+
+------------------------------------------------------------
+5) Local Storage (Permanent – Across Tabs)
+
+- Browser storage
+- Persists after browser close/restart
+- Shared across tabs
+- 5–10 MB storage
+- Stores only strings
+- Good for:
+   → Cart items
+   → Theme mode
+   → Preferences
+   → Drafts
+
+API:
+localStorage.setItem()
+localStorage.getItem()
+localStorage.removeItem()
+localStorage.clear()
+
+Store object:
+localStorage.setItem("profile", JSON.stringify(obj));
+
+Retrieve:
+JSON.parse(localStorage.getItem("profile"));
+
+------------------------------------------------------------
+6) Cookies (Authentication – Small Storage)
+
+- Small text files (4 KB)
+- Auto-sent with every HTTP request
+- Can be Temporary or Permanent
+- Used for:
+   → Login sessions
+   → Remember Me
+   → Tracking
+
+Syntax:
+document.cookie = "uname=Ganesh; expires=2025-12-01";
+
+Delete:
+document.cookie = "uname=; expires=Thu, 01 Jan 1970";
+
+Security Flags (Important):
+- Secure → HTTPS only
+- HttpOnly → JS cannot access cookie (Most secure)
+- SameSite → prevents CSRF
+
+------------------------------------------------------------
+7) Cookies vs LocalStorage vs SessionStorage (Important Table)
+
+Feature             Cookies           Local Storage       Session Storage
+----------------------------------------------------------------------------
+Lifetime            Expiry-based      Permanent           Tab close
+Size                4 KB              5–10 MB             5 MB
+Auto-sent?          YES               NO                  NO
+Security            High (HttpOnly)   Low                 Low
+Best for            Auth tokens       Preferences, cart   OTP, temp login
+
+------------------------------------------------------------
+8) SERVER-SIDE STATE MANAGEMENT
+
+1. Server Sessions:
+   - Session ID stored in cookie
+   - Server stores session data
+   - Good security
+   - Used in banking, enterprise apps
+
+2. JWT Tokens:
+   - Stateless login mechanism
+   - Token stored in cookie or local storage
+   - Good for APIs and mobile apps
+
+3. Redis:
+   - In-memory storage
+   - Very fast
+   - Used for session store, caching
+
+4. Database State:
+   - Permanent state (orders, users, products)
+
+------------------------------------------------------------
+9) Modern Application State (Frontend)
+
+1. Local Component State:
+   useState(), useReducer()
+
+2. Global UI State:
+   → Context API
+   → Redux Toolkit
+   → Zustand
+   → Recoil
+
+3. Server State (Managed by libraries):
+   → React Query
+   → SWR
+
+------------------------------------------------------------
+10) IMPORTANT INTERVIEW QUESTIONS
+
+Q1. Why do we need state management?
+A: Because HTTP is stateless. We need to maintain user information across requests.
+
+Q2. Difference between LocalStorage and SessionStorage?
+A:
+- LocalStorage = permanent
+- SessionStorage = cleared when tab closes
+
+Q3. Is LocalStorage secure?
+A: No (XSS can steal data)
+
+Q4. Should JWT be stored in LocalStorage?
+A: No. Use HTTP-only secure cookies.
+
+Q5. Does query string store sensitive data?
+A: No! It's visible in URL → unsafe.
+
+Q6. Why are cookies used for authentication?
+A: Automatically included in every HTTP request + can be HttpOnly + Secure.
+
+Q7. LocalStorage vs Cookies?
+A:
+- Cookies → small size, secure, auth
+- LocalStorage → big size, not secure, preferences
+
+------------------------------------------------------------
+11) FINAL REVISION (30 Seconds)
+
+- Query String → URL data
+- Session Storage → temporary per-tab
+- Local Storage → permanent across tabs
+- Cookies → secure, small, used for login
+- Server State → JWT, sessions, Redis, DB
+- Modern Frontend State → useState, Context, Redux
+
+------------------------------------------------------------
+12) Golden Rule:
+Sensitive data → ONLY store in HttpOnly Secure Cookies.
+Big data → LocalStorage.
+Temporary data → SessionStorage.
+URL-based data → Query String.
+Persistent server data → Database.
+
+------------------------------------------------------------
+END OF REVISION SHEET

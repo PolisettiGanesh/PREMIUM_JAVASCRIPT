@@ -1,0 +1,203 @@
+COOKIES – TRAINER LEVEL NOTES
+
+1) What Are Cookies?
+- Cookies are small text files stored in the browser.
+- Sent automatically with every HTTP request to the server.
+- Mostly used for:
+     → Authentication (Login sessions)
+     → User tracking
+     → Remember-me features
+     → Preferences
+- Size limit: 4 KB
+- Data is stored as simple string format.
+
+------------------------------------------------------------
+
+2) Types of Cookies:
+
+a) In-Memory Cookies (Temporary)
+- Exist only until browser is closed.
+- No expiry date is set.
+- Example:
+    document.cookie = "uname=Ganesh";
+
+b) Persistent Cookies (Permanent)
+- Exist until the expiry date.
+- Example:
+    document.cookie = "uname=Ganesh; expires=Mon, 31 Dec 2025 23:59:59 GMT";
+
+------------------------------------------------------------
+
+3) Cookie Syntax:
+
+Set a Cookie:
+document.cookie = "name=value";
+
+Set with Expiry:
+document.cookie = "name=value; expires=date";
+
+Delete Cookie:
+document.cookie = "name=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+
+------------------------------------------------------------
+
+4) Important Characteristics:
+- Automatically sent with HTTP requests.
+- Only 4KB storage.
+- Not suitable for large data.
+- Can be:
+    → Secure (HTTPS only)
+    → HttpOnly (Not accessible to JavaScript)
+    → SameSite policies for security
+- Cookies are accessible across tabs for the same domain.
+
+------------------------------------------------------------
+
+5) When To Use Cookies?
+- Authentication tokens (MOST COMMON)
+- "Remember Me" login
+- Tracking user preferences
+- Analytics tracking
+- Storing small user identifiers
+
+------------------------------------------------------------
+
+6) When NOT To Use Cookies?
+- Storing large data → use LocalStorage instead
+- Storing sensitive data in JS cookies → use HttpOnly Secure Cookies instead
+
+------------------------------------------------------------
+
+7) Cookie Login Example (Simple)
+
+login.html
+------------------------------------------------------------
+<script>
+function LoginClick() {
+    var username = document.getElementById("uname").value;
+    document.cookie = `uname=${username}; expires=${new Date("2025-12-07")}`;
+    location.href = "./dashboard.html";
+}
+</script>
+
+<input type="text" id="uname">
+<button onclick="LoginClick()">Login</button>
+------------------------------------------------------------
+
+dashboard.html
+------------------------------------------------------------
+<body onload="bodyload()">
+
+<script>
+function bodyload() {
+    var cookieValue = document.cookie;
+
+    // Get value after '=' symbol
+    var username = cookieValue.slice(cookieValue.indexOf("=") + 1);
+
+    if (username === "") {
+        location.href = "./login.html";
+    } else {
+        document.getElementById("lblUser").textContent = username;
+    }
+}
+
+function SignoutClick() {
+    // delete cookie by setting past date
+    document.cookie = `uname=; expires=${new Date("2020-01-01")}`;
+    location.href = "./login.html";
+}
+</script>
+------------------------------------------------------------
+
+8) How To Store Multiple Cookies:
+document.cookie = "uname=Ganesh; expires=2025-12-07";
+document.cookie = "city=Nellore; expires=2025-12-07";
+
+Retrieve:
+document.cookie → returns string:
+"uname=Ganesh; city=Nellore"
+
+------------------------------------------------------------
+
+9) Accessing Cookies Safely:
+
+// Convert cookies to object
+function getCookies() {
+    return document.cookie
+        .split(";")
+        .map(c => c.trim())
+        .reduce((acc, cookie) => {
+            const [name, value] = cookie.split("=");
+            acc[name] = value;
+            return acc;
+        }, {});
+}
+
+var allCookies = getCookies();
+console.log(allCookies.uname);
+console.log(allCookies.city);
+
+------------------------------------------------------------
+
+10) Cookie Security Flags (Important for Interviews):
+
+Secure:
+- Cookie only sent over HTTPS
+document.cookie = "token=abc; Secure";
+
+HttpOnly:
+- JavaScript cannot read the cookie (protects from XSS)
+- Must be set from server, not client
+
+SameSite:
+- Prevents CSRF attacks
+SameSite=Strict or Lax
+
+------------------------------------------------------------
+
+11) Cookies vs LocalStorage vs SessionStorage (Interview Table)
+
+Feature             Cookies             Local Storage       Session Storage
+----------------------------------------------------------------------------
+Lifetime            Based on expiry     Permanent           Until tab closes
+Size                4 KB                5–10 MB             5 MB
+Auto sent to server Yes                No                  No
+Security            High (HttpOnly)    Low                 Low
+Best Use            Auth, tracking      Preferences, cart   Temp data, OTP
+
+------------------------------------------------------------
+
+12) Flowchart: Cookie Login Flow
+
+User Login
+     │
+     ▼
+Set Cookie using document.cookie
+     │
+     ▼
+Dashboard loads → reads document.cookie
+     │
+ ┌────┴────┐
+ │         │
+empty     exists
+ │         │
+redirect  show username
+ │         │
+ ▼         ▼
+login   signout
+          │
+          ▼
+delete cookie by past expiry date
+
+------------------------------------------------------------
+
+13) 1-Minute Revision Summary
+
+- Cookies = small text files used for auth and tracking.
+- Sent automatically with every HTTP request.
+- Two types: temporary (no expiry) and permanent (set expiry).
+- Max size: 4KB.
+- delete cookie → set expiry to past date.
+- Secure cookies must be set on server with HttpOnly flag.
+- Best for authentication.

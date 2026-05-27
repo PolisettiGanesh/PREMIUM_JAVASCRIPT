@@ -1,0 +1,28 @@
+
+
+
+
+======================================================================
+User Login
+    │
+    ▼
+sessionStorage.setItem("uname")
+    │
+    ▼
+Dashboard Loads
+    │
+    ▼
+Check sessionStorage.getItem("uname")
+    │
+ ┌──┴───┐
+ │      │
+ ▼      ▼
+Null   Exists
+ │       │
+Redirect Show Dashboard
+ │       │
+ ▼       ▼
+Login   Timeout/Signout
+         │
+         ▼
+sessionStorage.removeItem()

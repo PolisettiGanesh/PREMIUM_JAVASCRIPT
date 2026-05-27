@@ -1,0 +1,176 @@
+LOCAL STORAGE – DEEP TRAINER-LEVEL NOTES
+
+1) What is Local Storage?
+- Local Storage is browser-provided storage.
+- Stores data as KEY-VALUE pairs.
+- Data is PERMANENT until manually deleted.
+- Data remains even after:
+    → Page reload
+    → Tab close
+    → Browser close
+    → System restart
+
+----------------------------------------------------
+
+2) Key Features:
+- Permanent storage
+- 5–10 MB capacity
+- Shared across all tabs of same domain
+- Synchronous API (blocks thread for large data)
+- Stores ONLY strings
+- Not secure → vulnerable to XSS attacks
+
+----------------------------------------------------
+
+3) Local Storage API (Syntax):
+
+Store data:
+localStorage.setItem("key", "value");
+
+Read data:
+localStorage.getItem("key");
+
+Remove a specific key:
+localStorage.removeItem("key");
+
+Clear ALL local storage:
+localStorage.clear();
+
+----------------------------------------------------
+
+4) Storing Objects (Important):
+localStorage.setItem("user", JSON.stringify({ name: "Ganesh", age: 22 }));
+
+Reading back:
+var user = JSON.parse(localStorage.getItem("user"));
+
+----------------------------------------------------
+
+5) Local Storage Login Flow (Flowchart Steps):
+
+1. User enters username
+2. Store username:
+      localStorage.setItem("uname", username);
+3. Redirect to dashboard
+4. Dashboard loads → fetch username using:
+      localStorage.getItem("uname")
+5. If null → redirect to login
+6. Else → show username on dashboard
+7. On logout → remove item:
+      localStorage.removeItem("uname")
+
+----------------------------------------------------
+
+6) Real-Life Use Cases:
+- Dark/Light theme preference
+- E-commerce cart items
+- Saved form drafts
+- Recently viewed items
+- Temporary API caching
+- Preferred language settings
+
+----------------------------------------------------
+
+7) When NOT to use Local Storage (Very Important):
+Do NOT store sensitive info:
+- Passwords
+- JWT tokens
+- Bank data
+- Personal identity info
+
+Reason:
+Local Storage is readable by JavaScript → XSS attacks can steal it.
+
+----------------------------------------------------
+
+8) Local Storage Example (Simple Login Flow)
+
+login.html
+----------------------------------------------------
+<input type="text" id="uname">
+<button onclick="LoginClick()">Login</button>
+
+<script>
+function LoginClick() {
+    var username = document.getElementById("uname").value;
+    localStorage.setItem("uname", username);
+    location.href = "./dashboard.html";
+}
+</script>
+----------------------------------------------------
+
+dashboard.html
+----------------------------------------------------
+<body onload="bodyload()">
+
+<script>
+function bodyload() {
+    var username = localStorage.getItem("uname");
+    if(username === null) {
+        location.href = "./login.html";
+    } else {
+        document.getElementById("lblUser").textContent = username;
+    }
+}
+
+function SignoutClick() {
+    localStorage.removeItem("uname");
+    location.href = "./login.html";
+}
+</script>
+----------------------------------------------------
+
+9) LocalStorage vs SessionStorage vs Cookies (Interview Table)
+
+Local Storage:
+- Lifetime: Permanent
+- Size: 5–10 MB
+- Security: Low
+- Auto-sent with HTTP? No
+- Best use: Preferences, cart, drafts
+
+Session Storage:
+- Lifetime: Until tab closes
+- Size: 5 MB
+- Security: Low
+- Auto-sent? No
+- Best use: OTP, temporary data
+
+Cookies:
+- Lifetime: Based on expiry
+- Size: 4 KB
+- Security: High with HttpOnly
+- Auto-sent? Yes
+- Best use: Authentication
+
+----------------------------------------------------
+
+10) Interview Questions:
+
+Q1) Is Local Storage secure?
+A: No, vulnerable to XSS. Avoid storing sensitive data.
+
+Q2) Can Local Storage store objects?
+A: Only after converting to string using JSON.stringify().
+
+Q3) Is Local Storage shared across tabs?
+A: Yes, for the same domain.
+
+Q4) Should JWT tokens be stored in Local Storage?
+A: No. Use HttpOnly Secure Cookies.
+
+Q5) Local Storage vs SessionStorage?
+A: Permanent vs tab-lifetime.
+
+----------------------------------------------------
+
+11) 1-Minute Revision Summary:
+
+- LocalStorage = Permanent browser storage
+- Capacity = 5–10 MB
+- Survives browser refresh & close
+- setItem(), getItem(), removeItem(), clear()
+- Stores only strings
+- Use JSON.stringify / JSON.parse
+- Good for: theme, cart, preferences
+- Bad for: tokens, passwords, sensitive info
