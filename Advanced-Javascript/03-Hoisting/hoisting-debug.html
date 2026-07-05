@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoisting & Call Stack — Debug Practice</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #1a1a2e;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            padding: 40px;
+            line-height: 1.8;
+        }
+        h1 { color: #00d4ff; text-align: center; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #888; margin-bottom: 40px; }
+        .step { background: #16213e; border-radius: 12px; padding: 25px; margin-bottom: 25px; border: 1px solid #2a2a4a; }
+        .step-number { display: inline-block; background: #00d4ff; color: #000; font-weight: bold; width: 35px; height: 35px; line-height: 35px; text-align: center; border-radius: 50%; margin-right: 10px; }
+        .step h2 { display: inline; color: #fff; font-size: 1.2rem; }
+        .step p { margin-top: 10px; color: #ccc; }
+        .screenshot { background: #0f0f23; border: 1px solid #333; border-radius: 8px; padding: 15px; margin: 15px 0; }
+        .screenshot-title { color: #ffa502; font-weight: bold; font-size: 0.85rem; margin-bottom: 10px; }
+        code { background: #0f0f23; color: #c3e88d; padding: 2px 6px; border-radius: 4px; font-family: 'Cascadia Code', Consolas, monospace; }
+        .key { display: inline-block; background: #333; color: #fff; padding: 2px 8px; border-radius: 4px; font-family: monospace; font-size: 0.85rem; border: 1px solid #555; }
+        .highlight { color: #00d4ff; font-weight: bold; }
+        .warn { color: #ffa502; }
+        .danger { color: #ff4757; }
+        .success { color: #2ed573; }
+        .panel-label { display: inline-block; background: rgba(0,212,255,0.1); color: #00d4ff; padding: 2px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: bold; margin: 2px; }
+        .arrow { color: #ffa502; font-size: 1.2rem; }
+        ul { margin: 10px 0 10px 20px; }
+        li { margin-bottom: 5px; }
+        .note { background: rgba(255,165,2,0.1); border: 1px solid rgba(255,165,2,0.3); border-radius: 8px; padding: 15px; margin: 15px 0; }
+        .note strong { color: #ffa502; }
+        .example-box { background: #0f0f23; border-left: 3px solid #00d4ff; border-radius: 0 8px 8px 0; padding: 15px; margin: 15px 0; font-family: 'Cascadia Code', Consolas, monospace; font-size: 0.9rem; line-height: 1.6; white-space: pre; overflow-x: auto; }
+        .divider { border: none; border-top: 1px solid #333; margin: 40px 0; }
+        .final { text-align: center; padding: 30px; color: #555; border-top: 1px solid #333; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+    <h1>Hoisting & Call Stack — Debug Practice</h1>
+    <p class="subtitle">Follow these steps EXACTLY. You'll SEE how JavaScript works internally.</p>
+
+    <!-- ======================================= -->
+    <!-- PART A: SETUP -->
+    <!-- ======================================= -->
+
+    <hr class="divider">
+    <h2 style="color: #ffa502; text-align: center; margin-bottom: 30px;">PART A — SETUP (Do This First)</h2>
+
+    <div class="step">
+        <span class="step-number">1</span>
+        <h2>Open This File in Chrome</h2>
+        <p>You should already be here. If you opened this in VS Code, right-click the file <span class="arrow">→</span> <code>Open with</code> <span class="arrow">→</span> <code>Chrome</code> or <code>Edge</code>.</p>
+        <p>Or simply drag this <code>hoisting-debug.html</code> file into Chrome's address bar.</p>
+    </div>
+
+    <div class="step">
+        <span class="step-number">2</span>
+        <h2>Open Chrome DevTools</h2>
+        <p>Press <span class="key">F12</span> on your keyboard.</p>
+        <p>Or right-click anywhere on this page <span class="arrow">→</span> click <strong>"Inspect"</strong>.</p>
+        <p>Or press <span class="key">Ctrl</span> + <span class="key">Shift</span> + <span class="key">I</span></p>
+        <p style="margin-top: 10px;">A panel will open on the right (or bottom) of your screen. This is <span class="highlight">Chrome DevTools</span>.</p>
+
+        <div class="screenshot">
+            <div class="screenshot-title">You should see these tabs at the top of DevTools:</div>
+<div class="example-box">Elements   Console   Sources   Network   Performance   ...</div>
+        </div>
+    </div>
+
+    <div class="step">
+        <span class="step-number">3</span>
+        <h2>Go to the "Sources" Tab</h2>
+        <p>Click on the <span class="panel-label">Sources</span> tab in DevTools.</p>
+        <p>This is where you'll see your JavaScript code and set breakpoints.</p>
+
+        <div class="screenshot">
+            <div class="screenshot-title">The Sources tab has 3 panels:</div>
+<div class="example-box">┌──────────┬───────────────────────────┬──────────────┐
+│          │                           │              │
+│  LEFT    │   CENTER                  │   RIGHT      │
+│  PANEL   │   PANEL                   │   PANEL      │
+│          │                           │              │
+│  File    │   Your Code               │  Watch       │
+│  Tree    │   (with line numbers)     │  Breakpoints │
+│          │                           │  Scope       │
+│          │                           │  Call Stack  │
+│          │                           │              │
+└──────────┴───────────────────────────┴──────────────┘</div>
+        </div>
+    </div>
+
+    <div class="step">
+        <span class="step-number">4</span>
+        <h2>Find Your JavaScript File</h2>
+        <p>In the <strong>LEFT panel</strong> (file tree), you'll see a folder structure.</p>
+        <p>Look for <code>hoisting-debug.js</code> and click on it.</p>
+        <p>If you don't see it, look under the domain name (it might say <code>file://</code> or <code>localhost</code>).</p>
+        <p>The code will appear in the <strong>CENTER panel</strong> with line numbers.</p>
+    </div>
+
+    <div class="step">
+        <span class="step-number">5</span>
+        <h2>Learn the RIGHT Panel — Your X-Ray Vision</h2>
+        <p>The right panel shows you the ENGINE'S brain. These are the sections you'll use:</p>
+        <ul>
+            <li><span class="panel-label">Watch</span> — Add any variable name to monitor its value as you step through code</li>
+            <li><span class="panel-label">Breakpoints</span> — Lists all breakpoints you've set</li>
+            <li><span class="panel-label">Scope</span> — Shows ALL variables and their values at the current line. This is where you SEE the memory component!</li>
+            <li><span class="panel-label">Call Stack</span> — Shows which functions are currently running (stacked). This IS the call stack from our notes!</li>
+        </ul>
+    </div>
+
+    <div class="step">
+        <span class="step-number">6</span>
+        <h2>Learn the Debugger Buttons</h2>
+        <p>At the top of the right panel (or the center panel), you'll see small buttons:</p>
+
+        <div class="screenshot">
+            <div class="screenshot-title">Debugger Control Buttons:</div>
+<div class="example-box">  ▶  Resume             (F8)   — Continue running until next breakpoint
+  ⏭  Step Over          (F10)  — Execute current line, move to next line
+  ⬇  Step Into          (F11)  — If current line calls a function, GO INSIDE it
+  ⬆  Step Out    (Shift+F11)   — Finish current function and go back to caller
+  ⏩  Step                (F9)   — Step to next function call</div>
+        </div>
+
+        <div class="note">
+            <strong>Most Important:</strong><br>
+            <span class="key">F10</span> = Step Over (go to next line)<br>
+            <span class="key">F11</span> = Step Into (go INSIDE a function call)<br>
+            <span class="key">F8</span> = Resume (run until next breakpoint)
+        </div>
+    </div>
+
+    <div class="step">
+        <span class="step-number">7</span>
+        <h2>How to Set a Breakpoint</h2>
+        <p>A <span class="highlight">breakpoint</span> tells the browser: "STOP here. Let me inspect."</p>
+        <p>To set one:</p>
+        <ul>
+            <li>Find the line number in the center panel</li>
+            <li><strong>Click on the line number</strong> (the number itself, on the left edge)</li>
+            <li>A <span class="danger">blue marker</span> (or red dot) appears — that's your breakpoint</li>
+            <li>Click again to remove it</li>
+        </ul>
+        <p>When the code reaches that line, execution PAUSES. You can then inspect everything.</p>
+    </div>
+
+    <!-- ======================================= -->
+    <!-- PART B: EXERCISES -->
+    <!-- ======================================= -->
+
+    <hr class="divider">
+    <h2 style="color: #2ed573; text-align: center; margin-bottom: 30px;">PART B — EXERCISES (Do Each One)</h2>
+
+    <!-- EXERCISE 1 -->
+    <div class="step">
+        <span class="step-number">E1</span>
+        <h2>Exercise 1: See var Hoisting with Your Eyes</h2>
+        <p><strong>Goal:</strong> Prove that <code>var</code> is <code>undefined</code> before its declaration line.</p>
+
+        <div class="screenshot">
+            <div class="screenshot-title">Steps:</div>
+<div class="example-box">1. In Sources tab, open hoisting-debug.js
+2. Click on LINE NUMBER 12 to set a breakpoint
+   (the line: console.log("Before declaration, a =", a);)
+3. RELOAD THE PAGE (Ctrl + R or F5)
+4. Code will PAUSE at line 12
+
+NOW OBSERVE:
+5. Look at the RIGHT panel → SCOPE section
+   → Expand "Script" or "Global"
+   → Find variable 'a'
+   → It shows: a = undefined
+   → This is PROOF of Phase 1!
+
+6. HOVER your mouse over the letter 'a' in the code
+   → A tooltip appears: undefined
+
+7. Press F10 (Step Over) to go to Line 13
+   → Now 'a' is still undefined (this line just ran console.log)
+
+8. Press F10 again to go to Line 14 (var a = 10)
+   → After this line, check SCOPE panel
+   → a = 10 (Phase 2 assigned the value!)
+
+9. Press F10 one more time
+   → Console shows: "After declaration, a = 10"</div>
+        </div>
+
+        <div class="note">
+            <strong>What you just saw:</strong> Variable 'a' existed as <code>undefined</code> BEFORE the line <code>var a = 10</code> was reached. This is hoisting. Phase 1 stored it. Phase 2 assigned it.
+        </div>
+    </div>
+
+    <!-- EXERCISE 2 -->
+    <div class="step">
+        <span class="step-number">E2</span>
+        <h2>Exercise 2: Step INSIDE a Function — Watch the Call Stack</h2>
+        <p><strong>Goal:</strong> See a new execution context being created and the call stack growing.</p>
+
+        <div class="screenshot">
+            <div class="screenshot-title">Steps:</div>
+<div class="example-box">1. Remove all previous breakpoints (click on them to remove)
+2. Set a breakpoint on LINE 27
+   (the line: var result = add(5, 3);)
+3. RELOAD THE PAGE (Ctrl + R)
+4. Code pauses at Line 27
+
+NOW:
+5. Look at CALL STACK panel (right side, bottom area)
+   → It shows: (anonymous)
+   → This is the GEC (Global Execution Context)!
+
+6. Press F11 (Step INTO) — this enters the add() function
+   → You jump to Line 30 (inside the function)
+   → CALL STACK now shows:
+        add          ← top (current function)
+        (anonymous)  ← bottom (global)
+   → TWO items in the stack! GEC + function context!
+
+7. Look at SCOPE panel:
+   → "Local" section appeared!
+   → x = 5
+   → y = 3
+   → sum = undefined  ← Phase 1 for this function!
+   → This IS the function's memory component!
+
+8. Press F10 (Step Over) — executes Line 31
+   → SCOPE panel: sum changes from undefined → 8
+   → This IS Phase 2 assigning the value!
+
+9. Press F10 again — executes Line 32 (return sum)
+   → You jump BACK to Line 27 (the caller)
+   → CALL STACK: back to just (anonymous)
+   → The function context was DESTROYED!
+   → "Local" section disappears from Scope
+
+10. Check: result = 8 in the Scope panel</div>
+        </div>
+
+        <div class="note">
+            <strong>What you just saw:</strong> A function call created a NEW execution context (visible in Call Stack). It had its own memory (visible in Scope → Local). Parameters started with values, local variables started as <code>undefined</code> (Phase 1). After return, the context was destroyed (popped off Call Stack, Local scope disappeared).
+        </div>
+    </div>
+
+    <!-- EXERCISE 3 -->
+    <div class="step">
+        <span class="step-number">E3</span>
+        <h2>Exercise 3: Watch the Call Stack Grow 3 Levels Deep</h2>
+        <p><strong>Goal:</strong> See 3 functions stacked on the Call Stack, then watch them pop off one by one.</p>
+
+        <div class="screenshot">
+            <div class="screenshot-title">Steps:</div>
+<div class="example-box">1. Remove all breakpoints
+2. Set a breakpoint on LINE 61
+   (the line: first();)
+3. RELOAD THE PAGE
+4. Code pauses at Line 61
+
+5. Press F11 (Step Into) → enters first()
+   CALL STACK:
+   ┌─────────────┐
+   │  first       │
+   │  (anonymous) │
+   └─────────────┘
+
+6. Press F10 until you reach Line 49: second()
+   Then press F11 (Step Into) → enters second()
+   CALL STACK:
+   ┌─────────────┐
+   │  second      │
+   │  first       │
+   │  (anonymous) │
+   └─────────────┘
+
+7. Press F10 until you reach Line 54: third()
+   Then press F11 (Step Into) → enters third()
+   CALL STACK:
+   ┌─────────────┐
+   │  third       │  ← 3 levels deep!
+   │  second      │
+   │  first       │
+   │  (anonymous) │
+   └─────────────┘
+
+   → This is the TALLEST the stack gets!
+
+8. Press F10 → third() finishes
+   CALL STACK:
+   ┌─────────────┐
+   │  second      │  ← third popped off!
+   │  first       │
+   │  (anonymous) │
+   └─────────────┘
+
+9. Press F10 until second() finishes
+   CALL STACK:
+   ┌─────────────┐
+   │  first       │  ← second popped off!
+   │  (anonymous) │
+   └─────────────┘
+
+10. Press F10 until first() finishes
+    CALL STACK:
+    ┌─────────────┐
+    │  (anonymous) │  ← first popped off! Back to GEC only
+    └─────────────┘
+
+CHECK THE CONSOLE — output order:
+   first() START
+   second() START
+   third() runs
+   second() END
+   first() END</div>
+        </div>
+
+        <div class="note">
+            <strong>What you just saw:</strong> The Call Stack grew from 1 → 2 → 3 → 4 items, then shrank back 4 → 3 → 2 → 1. LIFO order — last function called was first to finish. This is exactly the diagram from our notes, but now you SAW it happen live.
+        </div>
+    </div>
+
+    <!-- EXERCISE 4 -->
+    <div class="step">
+        <span class="step-number">E4</span>
+        <h2>Exercise 4: See Scope Difference — var Leaks, let Stays</h2>
+        <p><strong>Goal:</strong> Prove that <code>var</code> escapes blocks but <code>let</code> doesn't.</p>
+
+        <div class="screenshot">
+            <div class="screenshot-title">Steps:</div>
+<div class="example-box">1. Remove all breakpoints
+2. Set breakpoints on LINE 88, LINE 89, and LINE 93
+3. RELOAD THE PAGE
+4. Pauses at Line 88 (inside the if block)
+
+5. Press F10 → Line 89
+   Look at SCOPE panel:
+   → "Block" section: stayed = "I stayed inside!"
+   → "Script" section: leaked = "I escaped the if block!"
+
+   NOTICE:
+   → 'leaked' (var) is in SCRIPT scope (global-level)
+   → 'stayed' (let) is in BLOCK scope (confined to if block)
+   → This is the visual proof of scope difference!
+
+6. Press F8 (Resume) → jumps to Line 93 (outside the if block)
+   Look at SCOPE panel:
+   → "Script" section: leaked = "I escaped the if block!" ← STILL HERE!
+   → "Block" section: GONE! 'stayed' no longer exists!
+
+   → var leaked OUT of the if block into global scope
+   → let was DESTROYED when the block ended</div>
+        </div>
+
+        <div class="note">
+            <strong>What you just saw:</strong> The Scope panel visually showed you that <code>var</code> lives in Script/Global scope (escapes blocks) while <code>let</code> lives in Block scope (destroyed when block ends). This is why <code>let</code> is safer.
+        </div>
+    </div>
+
+    <!-- EXERCISE 5 -->
+    <div class="step">
+        <span class="step-number">E5</span>
+        <h2>Exercise 5: The Interview Trap — Local var Shadows Global</h2>
+        <p><strong>Goal:</strong> See why <code>var x</code> inside a function makes the global <code>x</code> invisible.</p>
+
+        <div class="screenshot">
+            <div class="screenshot-title">Steps:</div>
+<div class="example-box">1. Remove all breakpoints
+2. Set breakpoints on LINE 131 and LINE 132
+3. RELOAD THE PAGE
+4. Press F8 until you reach Line 131 (inside test() function)
+
+5. YOU ARE NOW AT LINE 131: console.log("x inside test:", x)
+
+   Before pressing F10, CHECK:
+   → SCOPE panel → "Local" section
+   → You'll see: x = undefined
+   → SCOPE panel → "Script" section
+   → You'll see: x = 1 (the global one)
+
+   → The function has its OWN 'x' (from Phase 1 hoisting var x = 2)
+   → This local x = undefined SHADOWS the global x = 1
+   → That's why console.log prints undefined, not 1!
+
+6. Press F10 → Line 132: var x = 2
+   → Check Scope: Local → x changes from undefined → 2
+
+7. Press F10 → Line 133
+   → console.log prints "x inside test (after var): 2"
+
+8. Press F10 until function returns
+   → Back in global scope
+   → Check Scope: x = 1 (global was never touched!)</div>
+        </div>
+
+        <div class="note">
+            <strong>What you just saw:</strong> The function's local <code>var x</code> was hoisted to the top of the function as <code>undefined</code>, creating a LOCAL variable that SHADOWS the global <code>x = 1</code>. The global x was never modified. This is the most common hoisting interview question — now you've seen it live.
+        </div>
+    </div>
+
+    <!-- EXERCISE 6 -->
+    <div class="step">
+        <span class="step-number">E6</span>
+        <h2>Exercise 6: Watch Loop + setTimeout — var vs let</h2>
+        <p><strong>Goal:</strong> See why <code>var</code> prints 3,3,3 and <code>let</code> prints 0,1,2.</p>
+
+        <div class="screenshot">
+            <div class="screenshot-title">Steps:</div>
+<div class="example-box">1. Remove all breakpoints
+2. Set a breakpoint on LINE 173
+   (inside the setTimeout callback: console.log("var i =", i))
+3. RELOAD THE PAGE
+
+4. The page will run all synchronous code first.
+   Wait — the breakpoint won't hit immediately!
+   setTimeout is async — it fires AFTER 2 seconds.
+
+5. After ~2 seconds, the breakpoint on Line 173 hits.
+   CHECK SCOPE panel:
+   → There is NO "Block" scope
+   → Look at Script or Global scope
+   → i = 3
+   → ALL THREE callbacks see i = 3 (the loop already finished!)
+
+6. Press F8 (Resume) → hits Line 173 again (2nd callback)
+   → i = 3 again!
+
+7. Press F8 → hits again (3rd callback)
+   → i = 3 AGAIN!
+
+8. Console output: var i = 3, var i = 3, var i = 3
+
+NOW WATCH THE let VERSION:
+
+9. Remove breakpoint on Line 173
+10. Set breakpoint on LINE 180
+    (inside the let setTimeout: console.log("let j =", j))
+11. RELOAD THE PAGE
+12. Wait ~3 seconds for the let callbacks to fire
+
+13. Breakpoint hits Line 180
+    CHECK SCOPE panel:
+    → "Block" scope appears!
+    → j = 0  ← its OWN copy!
+
+14. Press F8 → hits again
+    → Block scope: j = 1  ← DIFFERENT copy!
+
+15. Press F8 → hits again
+    → Block scope: j = 2  ← DIFFERENT copy!
+
+16. Console output: let j = 0, let j = 1, let j = 2</div>
+        </div>
+
+        <div class="note">
+            <strong>What you just saw:</strong> With <code>var</code>, the Scope panel showed ONE shared <code>i</code> in global scope — all callbacks saw the same final value (3). With <code>let</code>, the Scope panel showed a BLOCK scope with a unique <code>j</code> per callback — each captured its own value (0, 1, 2). This is the most visual proof of why <code>let</code> is correct in loops.
+        </div>
+    </div>
+
+    <!-- EXERCISE BONUS -->
+    <div class="step">
+        <span class="step-number">B</span>
+        <h2>BONUS: Add Watch Expressions</h2>
+        <p><strong>Goal:</strong> Monitor specific variables as you step through code.</p>
+
+        <div class="screenshot">
+            <div class="screenshot-title">Steps:</div>
+<div class="example-box">1. In the RIGHT panel, find the "Watch" section
+2. Click the + button
+3. Type a variable name (e.g., "a" or "x" or "result")
+4. Press Enter
+5. As you step through code, the Watch panel shows the
+   LIVE value of that variable at every step
+
+TRY THIS:
+→ Set breakpoint on Line 12
+→ Add watches for: a, typeof a
+→ Reload and step through
+→ Watch how 'a' goes from undefined → 10
+→ Watch how typeof changes from "undefined" → "number"
+
+YOU CAN ALSO ADD EXPRESSIONS:
+→ Watch: a + b
+→ Watch: typeof foo
+→ Watch: i < 3
+These evaluate live as you step!</div>
+        </div>
+    </div>
+
+    <!-- ======================================= -->
+    <!-- PART C: CHEAT SHEET -->
+    <!-- ======================================= -->
+
+    <hr class="divider">
+    <h2 style="color: #00d4ff; text-align: center; margin-bottom: 30px;">PART C — CHEAT SHEET</h2>
+
+    <div class="step">
+        <span class="step-number">CS</span>
+        <h2>Debugger Cheat Sheet</h2>
+
+        <div class="screenshot">
+            <div class="screenshot-title">Keyboard Shortcuts:</div>
+<div class="example-box">F12              → Open/Close DevTools
+Ctrl + Shift + I → Open DevTools (alternative)
+Ctrl + R         → Reload page (restarts your JS)
+F8               → Resume (run until next breakpoint)
+F10              → Step Over (next line, don't enter functions)
+F11              → Step Into (enter the function call)
+Shift + F11      → Step Out (exit current function)
+Ctrl + \         → Pause script execution
+Ctrl + F         → Search in Sources panel</div>
+        </div>
+
+        <div class="screenshot">
+            <div class="screenshot-title">What Each Panel Shows You:</div>
+<div class="example-box">SCOPE PANEL — The Memory Component!
+├── Local    → variables inside the current function
+├── Block    → variables declared with let/const in current {} block
+├── Script   → top-level let/const variables
+├── Global   → var variables + window properties
+└── Closure  → variables from outer functions (closures)
+
+CALL STACK PANEL — The Execution Context Stack!
+├── Shows all active function calls
+├── Top item = currently executing function
+├── Bottom item = (anonymous) = Global Execution Context
+├── Click any item to jump to that context
+└── Watch it grow/shrink as functions call/return
+
+WATCH PANEL — Your Custom Monitors!
+├── Add any expression to track
+├── Updates live as you step through code
+└── Shows "not available" if variable is out of scope</div>
+        </div>
+
+        <div class="screenshot">
+            <div class="screenshot-title">Breakpoint Tips:</div>
+<div class="example-box">Click line number          → Toggle breakpoint
+Right-click line number    → Conditional breakpoint
+                             (only pauses when condition is true)
+                             e.g., "i === 2" → pauses only when i is 2
+
+You can also type "debugger;" directly in your JS code:
+   function test() {
+       debugger;          // ← code pauses HERE automatically
+       console.log("hi");
+   }</div>
+        </div>
+    </div>
+
+    <!-- ======================================= -->
+    <!-- PART D: WHAT YOU'VE PROVEN -->
+    <!-- ======================================= -->
+
+    <hr class="divider">
+    <h2 style="color: #2ed573; text-align: center; margin-bottom: 30px;">PART D — WHAT YOU PROVED TODAY</h2>
+
+    <div class="step">
+        <span class="step-number">✓</span>
+        <h2>Concepts You Visually Verified</h2>
+        <ul>
+            <li><span class="success">✅</span> <strong>Phase 1 (Memory Creation)</strong> — Saw <code>var</code> as <code>undefined</code> in Scope panel before the assignment line</li>
+            <li><span class="success">✅</span> <strong>Phase 2 (Code Execution)</strong> — Watched values change from <code>undefined</code> to actual values as you stepped</li>
+            <li><span class="success">✅</span> <strong>Function Hoisting</strong> — Called <code>add()</code> before its declaration and it worked</li>
+            <li><span class="success">✅</span> <strong>Function Execution Context</strong> — Saw "Local" scope appear when entering a function, disappear when leaving</li>
+            <li><span class="success">✅</span> <strong>Call Stack</strong> — Watched it grow (push) when functions are called and shrink (pop) when they return</li>
+            <li><span class="success">✅</span> <strong>3-Level Deep Stack</strong> — Saw first → second → third stacked, then unwound in reverse</li>
+            <li><span class="success">✅</span> <strong>var Leaks Scope</strong> — Saw <code>var</code> in Script scope even after the <code>if</code> block ended</li>
+            <li><span class="success">✅</span> <strong>let Block Scope</strong> — Saw <code>let</code> in Block scope that disappeared when the block ended</li>
+            <li><span class="success">✅</span> <strong>Shadowing</strong> — Saw local <code>var x</code> hiding the global <code>x</code> inside a function</li>
+            <li><span class="success">✅</span> <strong>Loop + setTimeout</strong> — Saw <code>var</code> sharing one i=3, while <code>let</code> had separate j=0,1,2 in Block scopes</li>
+        </ul>
+    </div>
+
+    <div class="final">
+        <p>You didn't just READ about hoisting and call stack.</p>
+        <p>You SAW it. In the actual engine. With your own eyes.</p>
+        <p style="margin-top: 10px; color: #00d4ff;">That's the difference between memorizing and understanding.</p>
+    </div>
+
+    <!-- Load the JavaScript file -->
+    <script src="hoisting-debug.js"></script>
+
+</body>
+</html>
